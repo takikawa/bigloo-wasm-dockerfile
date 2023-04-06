@@ -27,7 +27,8 @@ RUN wget https://gist.github.com/takikawa/f913b9f81dd31950cdd99534956de7b4/raw/8
   wget https://gist.github.com/takikawa/c02c94087ab969b5203251931e419815/raw/737712bdf1f7f8577171f670882f666dd22ca3c7/cports.patch && \
   wget https://gist.github.com/takikawa/27b87582a52b400c438e114894bb67f4/raw/116c23e3d4b57f60ae29e42c3c18a9aacccedee1/configure-wasm.patch && \
   wget https://gist.github.com/takikawa/16852e009feac36be3e89634a151078d/raw/8c1a5a17330e81716c9e68b15e959fbcdbc26b75/autoconf-inet.patch && \
-  wget https://gist.github.com/takikawa/1316c7dbfe6a7b3b15e92d17521f0781/raw/e8327b3fe0f4c99e5540470f6f64097cf0fa3ead/autoconf-socklen.patch
+  wget https://gist.github.com/takikawa/1316c7dbfe6a7b3b15e92d17521f0781/raw/e8327b3fe0f4c99e5540470f6f64097cf0fa3ead/autoconf-socklen.patch && \
+  wget https://gist.github.com/takikawa/e3bdb81eb987b26d7584d3f4e885d5ed/raw/2d3bdcc6415e466361da0ef5b6eaad3ae219f71f/gc-patch.patch
 RUN cd ../bigloo-wasm && \
   mv ../cyclecounter.patch gmp/ && \
   patch gmp/configure-gmp < ../configure-gmp.patch && \
@@ -35,6 +36,7 @@ RUN cd ../bigloo-wasm && \
   patch configure < ../configure-wasm.patch && \
   patch autoconf/inet_aton < ../autoconf-inet.patch && \
   patch autoconf/socklen < ../autoconf-socklen.patch && \
+  patch gc/gc-8.2.2.patch -l < ../gc-patch.patch && \
   /emsdk/upstream/emscripten/emconfigure ./configure --clang --cflags="-D_GNU_SOURCE" --prefix=/opt/bigloo-wasm --stack-check=no --no-resolv --no-pcre2 --no-unistring --disable-threads --disable-libuv --disable-mqtt --customgmp=yes --gmpconfigureopt="--disable-assembly" --build-bindir=/opt/bigloo/bin --bflags="-O3 -fcfa-arithmetic -q -ldopt -L/bigloo-wasm/gmp/opt/bigloo-wasm/lib/bigloo/4.5a/" && \
   make -j && \
   make install
