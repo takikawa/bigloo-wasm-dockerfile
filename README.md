@@ -11,3 +11,9 @@ $ emsdk/node/14.18.2_64bit/bin/node hello.js
 ```
 
 This currently errors due to an `unreachable` instruction, likely somewhere in booting up the runtime system.
+
+---
+
+The patches this Dockerfile depends on are licensed under GPLv2 under the same terms as the original Bigloo code.
+
+This Dockerfile itself is licensed under the MIT license
