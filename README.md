@@ -5,12 +5,17 @@ Example:
 ```
 docker build .
 docker run --rm -it --entrypoint bash <imagehash>
-$ echo '(module hello) (display "hello world") (newline)' > hello.scm
-$ /opt/bigloo/bin/bigloo hello.scm -o hello.js -cc /emsdk/upstream/emscripten/emcc -copt '-sASYNCIFY -L/opt/bigloo-wasm/lib/bigloo/4.5a -I/bigloo-wasm/gmp/gmp-6.2.1/'
+$ echo '(module num) (display-fixnum (+ 1 1) (current-output-port))' > num.scm
+$ /opt/bigloo/bin/bigloo num.scm -o num.js -cc /emsdk/upstream/emscripten/emcc -copt '-sASYNCIFY -sEMULATE_FUNCTION_POINTER_CASTS=1 -sEXIT_RUNTIME -s BINARYEN_EXTRA_PASSES="--pass-arg=max-func-params@70" -L/opt/bigloo-wasm/lib/bigloo/4.5a -I/bigloo-wasm/gmp/gmp-6.2.1/'
 $ emsdk/node/14.18.2_64bit/bin/node hello.js
 ```
 
-This currently errors due to an `unreachable` instruction, likely somewhere in booting up the runtime system.
+This example does run, but currently prints the wrong result value. Other examples
+involving printing and output ports don't seem to work very well.
+
+The `EMULATE_FUNCTION_POINTER_CASTS` option is required because of the use of
+function pointer casts in Bigloo-produced C code. See [this emscripten doc page](https://emscripten.org/docs/porting/guidelines/function_pointer_issues.html)
+for details. Using this option requires the additional `max-func-params` option.
 
 ---
 
