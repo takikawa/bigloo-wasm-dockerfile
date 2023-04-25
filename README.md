@@ -7,7 +7,7 @@ docker build .
 docker run --rm -it --entrypoint bash <imagehash>
 $ echo '(module hello) (display "hello world") (newline)' > hello.scm
 $ /opt/bigloo/bin/bigloo -O3 hello.scm -o hello.js -cc /emsdk/upstream/emscripten/emcc -copt '-O3 -sASYNCIFY -sEXIT_RUNTIME  -L/opt/bigloo-wasm/lib/bigloo/4.5a -I/bigloo-wasm/gmp/gmp-6.2.1/'
-$ emsdk/node/14.18.2_64bit/bin/node hello.js
+$ emsdk/node/15.14.0_64bit/bin/node hello.js
 ```
 
 The `EMULATE_FUNCTION_POINTER_CASTS` option is required because of the use of
