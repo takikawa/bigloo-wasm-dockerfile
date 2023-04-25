@@ -1,25 +1,25 @@
 # syntax=docker/dockerfile:1
 
 FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y python3 gcc make libtool git xz-utils bzip2 wget
+RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y python3 gcc make libtool git xz-utils bzip2 wget gcc-11-multilib-i686-linux-gnu libc6:i386 gcc-11-i686-linux-gnu
 RUN git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install 3.1.35 && ./emsdk activate 3.1.35
 RUN wget ftp://ftp-sop.inria.fr/indes/fp/Bigloo/bigloo-4.5a-1.tar.gz && tar xvzf bigloo-4.5a-1.tar.gz
 # see patches: https://gist.github.com/takikawa/1e2c64cbb92cb4bcf54c0d618d5491d5
 #              https://gist.github.com/takikawa/4a133e6c320e582d75b3a6d5d92cdd28
 #              https://gist.github.com/takikawa/a17095485eda112a8a319b6015f6c9a1
 #              https://gist.github.com/takikawa/5ae0bd494f776c27c49005f1fbf60afe
-RUN wget https://gist.github.com/takikawa/1e2c64cbb92cb4bcf54c0d618d5491d5/raw/030a6ae7b59a5f0d01398ec03400b69c6c2faeed/spinlock.patch && \
+RUN wget https://gist.githubusercontent.com/takikawa/1e2c64cbb92cb4bcf54c0d618d5491d5/raw/8dbb220aef71f9d4549ab89a6600c12f738aedb8/host-configure.patch && \
   wget https://gist.github.com/takikawa/4a133e6c320e582d75b3a6d5d92cdd28/raw/b5e20615d3073b7dad66bb27ce49fe87e174039c/runtime-makefile.patch && \
   wget https://gist.github.com/takikawa/a17095485eda112a8a319b6015f6c9a1/raw/f91837eaf66df674ff930220cb91959d63e31377/api-makefile.patch && \
   wget https://gist.github.com/takikawa/5ae0bd494f776c27c49005f1fbf60afe/raw/fd99098342223ff7e351200adda25c7a0712831d/api-makefile-safe.patch
 RUN cd bigloo-4.5a-1 && \
-  patch configure < ../spinlock.patch && \
+  patch configure < ../host-configure.patch && \
   patch runtime/Makefile < ../runtime-makefile.patch && \
   patch api/Makefile.api < ../api-makefile.patch && \
   patch api/Makefile.api-safe < ../api-makefile-safe.patch
 RUN cp -R bigloo-4.5a-1 bigloo-wasm
 RUN cd bigloo-4.5a-1 && \
-  ./configure --prefix=/opt/bigloo --no-resolv --no-pcre2 --no-unistring --disable-threads --disable-libuv --disable-mqtt && \
+./configure --cc="i686-linux-gnu-gcc-11" --prefix=/opt/bigloo --no-resolv --no-pcre2 --no-unistring --disable-threads --disable-libuv --disable-mqtt --gmpconfigureopt="--host=i686-gnu-linux" --gcconfigureopt="--host=i686-gnu-linux" --stack-check=no && \
   make -j && \
   make install
 RUN wget https://gist.github.com/takikawa/f913b9f81dd31950cdd99534956de7b4/raw/8656aa5a168f00d0b49f7dd113f62d6802959743/configure-gmp.patch && \
