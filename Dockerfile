@@ -42,3 +42,15 @@ RUN cd ../bigloo-wasm && \
   LDFLAGS="-sASYNCIFY" /emsdk/upstream/emscripten/emconfigure ./configure --clang --cflags="-D_GNU_SOURCE" --prefix=/opt/bigloo-wasm --stack-check=no --no-resolv --no-pcre2 --no-unistring --disable-threads --disable-libuv --disable-mqtt --customgmp=yes --gmpconfigureopt="--disable-assembly" --build-bindir=/opt/bigloo/bin --bflags="-O3 -fcfa-arithmetic -q -ldopt -L/bigloo-wasm/gmp/opt/bigloo-wasm/lib/bigloo/4.5a/" && \
   make -j && \
   make install
+RUN git clone https://github.com/takikawa/hop.git && \
+  cd hop && \
+  git checkout 82d3e6c287b632872cf99c86e9352f43fee2effb && \
+  cp -R . ../hop-wasm
+RUN cd hop && \
+  ./configure --cc="i686-linux-gnu-gcc-11" --disable-ssl --bigloo-unistring=no --bigloo-pcre=no --prefix=/opt/hop --build-bindir=/opt/bigloo/bin  --hopc=/hop/bin/hopc --disable-doc --disable-threads --disable-libuv && \
+  make -j build-sans-modules && \
+  make install
+RUN cd hop-wasm && \
+  LDFLAGS="-sASYNCIFY" /emsdk/upstream/emscripten/emconfigure ./configure --hopc=/hop/bin/hopc --bigloolibdir=/opt/bigloo-wasm/lib/bigloo/4.5a/ --disable-ssl --link=static --bigloo-unistring=no --bigloo-pcre=no --prefix=/opt/hop-wasm --build-bigloo=/opt/bigloo/bin/bigloo --disable-doc --disable-threads  --disable-libuv --cc=/emsdk/upstream/emscripten/emcc --extra-bcflags="-copt '-I/bigloo-4.5a-1/gmp/gmp-6.2.1/ -L/opt/bigloo-wasm/lib/bigloo/4.5a/' -ccflags=-I/bigloo-4.5a-1/gmp/gmp-6.2.1/ -L/opt/bigloo-wasm/lib/bigloo/4.5a/" && \
+  make -j build-sans-modules && \
+  make install
